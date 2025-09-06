@@ -1,0 +1,15 @@
+services:
+  postgres:
+
+    container_name: sbd2
+
+    image: postgres
+
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_DB: sbd2
+
+    ports:
+      - "5433:5432"
+
