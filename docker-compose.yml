@@ -1,6 +1,9 @@
 services:
   postgres:
 
+    networks:
+      - populate_db
+
     container_name: airbnb-database
     image: postgres
 
@@ -14,8 +17,13 @@ services:
 
   etl:
     build: .
+    networks:
+      - populate_db
     ports:
       - "8888:8888"
     depends_on:
       postgres:
         condition: service_started
+
+networks:
+  populate_db:
