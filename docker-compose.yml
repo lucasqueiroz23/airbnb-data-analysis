@@ -1,15 +1,21 @@
 services:
   postgres:
 
-    container_name: sbd2
-
+    container_name: airbnb-database
     image: postgres
 
     environment:
       POSTGRES_PASSWORD: postgres
       POSTGRES_USER: postgres
-      POSTGRES_DB: sbd2
+      POSTGRES_DB: airbnb
 
     ports:
       - "5433:5432"
 
+  etl:
+    build: .
+    ports:
+      - "8888:8888"
+    depends_on:
+      postgres:
+        condition: service_started
