@@ -8,6 +8,4 @@ RUN pip install -r requirements.txt
 
 EXPOSE 8888
 
-RUN jupyter execute ./raw/analytics.ipynb
-
 CMD ["bash", "execute-scripts.sh"]

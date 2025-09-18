@@ -5,7 +5,7 @@ services:
       - populate_db
 
     container_name: airbnb-database
-    image: postgres
+    image: postgres:latest-alpine
 
     environment:
       POSTGRES_PASSWORD: postgres
