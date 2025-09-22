@@ -14,16 +14,3 @@ services:
 
     ports:
       - "5433:5432"
-
-  etl:
-    build: .
-    networks:
-      - populate_db
-    ports:
-      - "8888:8888"
-    depends_on:
-      postgres:
-        condition: service_started
-
-networks:
-  populate_db:
