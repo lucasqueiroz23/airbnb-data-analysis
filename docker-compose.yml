@@ -1,15 +1,16 @@
 services:
   postgres:
 
-    container_name: sbd2
+    networks:
+      - populate_db
 
-    image: postgres
+    container_name: airbnb-database
+    image: postgres:latest-alpine
 
     environment:
       POSTGRES_PASSWORD: postgres
       POSTGRES_USER: postgres
-      POSTGRES_DB: sbd2
+      POSTGRES_DB: airbnb
 
     ports:
       - "5433:5432"
-
