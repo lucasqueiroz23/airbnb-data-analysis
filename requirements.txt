@@ -3,4 +3,4 @@ pandas
 numpy
 matplotlib
 seaborn
-psycopg2
+psycopg[binary,pool]

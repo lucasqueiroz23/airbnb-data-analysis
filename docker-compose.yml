@@ -1,11 +1,8 @@
 services:
   postgres:
 
-    networks:
-      - populate_db
-
     container_name: airbnb-database
-    image: postgres:latest-alpine
+    image: postgres:latest
 
     environment:
       POSTGRES_PASSWORD: postgres
