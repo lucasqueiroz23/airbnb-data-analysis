@@ -1,11 +1,8 @@
 services:
   postgres:
 
-    networks:
-      - populate_db
-
     container_name: airbnb-database
-    image: postgres:latest-alpine
+    image: postgres:latest
 
     environment:
       POSTGRES_PASSWORD: postgres
@@ -14,3 +11,14 @@ services:
 
     ports:
       - "5433:5432"
+
+  pgadmin:
+    container_name: airbnb-pgadmin
+    image: dpage/pgadmin4:latest
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "8080:80"
+    depends_on:
+      - postgres
