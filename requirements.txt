@@ -1,5 +1,10 @@
-jupyterlab
 pandas
-numpy
-matplotlib
 seaborn
+matplotlib
+numpy
+folium
+ipython
+pycountry
+plotly
+geopandas
+branca
