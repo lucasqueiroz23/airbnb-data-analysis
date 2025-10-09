@@ -1,7 +1,13 @@
+folium
+geopandas
+ipython
 jupyterlab
-pandas
-numpy
 matplotlib
-seaborn
-psycopg[binary,pool]
+numpy
+pandas
 pandoc
+plotly
+psycopg[binary,pool]
+pycountry
+seaborn
+reverse_geocoder
