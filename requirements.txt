@@ -11,3 +11,4 @@ psycopg[binary,pool]
 pycountry
 seaborn
 reverse_geocoder
+scikit-learn
