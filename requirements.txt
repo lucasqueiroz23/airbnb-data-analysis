@@ -13,3 +13,4 @@ seaborn
 reverse_geocoder
 scikit-learn
 missingno
+dotenv
