@@ -13,7 +13,7 @@ FROM
     gold.FATO_ANUNCIO;
 
 
--- 3) Contagem de bairros
+-- 3) Contagem de SUB REGIÕES POR BAIRRO
 SELECT
     COUNT(DISTINCT bairro) AS count_of_neighbourhood
 FROM
@@ -33,6 +33,9 @@ SELECT
     COUNT(SRK_aval) AS total_ultimas_avaliacoes
 FROM
     gold.DIM_ULTIMA_AVALIACAO
+WHERE
+	ano IS NOT NULL
+	AND ano <= 2022
 GROUP BY
     ano
 ORDER BY
