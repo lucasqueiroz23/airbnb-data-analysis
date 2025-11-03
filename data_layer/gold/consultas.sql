@@ -1,137 +1,142 @@
-
 -- 1) Média de avaliações por mês
 SELECT
-    AVG(rev_mes) AS average_reviews_per_month
+    AVG(rev_mes) AS media_avaliacoes_por_mes
 FROM
-    gold.FATO_ANUNCIO;
+    dw.FATO_ANUNCIO AS fato_anuncio;
 
 
 -- 2) Soma do número de avaliações
 SELECT
-    SUM(tot_rev) AS sum_of_reviews
+    SUM(tot_rev) AS soma_total_avaliacoes
 FROM
-    gold.FATO_ANUNCIO;
+    dw.FATO_ANUNCIO AS fato_anuncio;
 
 
 -- 3) Contagem de SUB REGIÕES POR BAIRRO
 SELECT
-    COUNT(DISTINCT bairro) AS count_of_neighbourhood
+    COUNT(DISTINCT bairro) AS quantidade_bairros
 FROM
-    gold.DIM_LOCALIZACAO;
+    dw.DIM_LOCALIZACAO AS dimensao_localizacao;
 
 
 -- 4) Contagem de anfitriões
 SELECT
-    COUNT(DISTINCT SRK_anfi) AS count_of_hosts
+    COUNT(DISTINCT SRK_anfi) AS quantidade_anfitrioes
 FROM
-    gold.DIM_ANFITRIAO;
+    dw.DIM_ANFITRIAO AS dimensao_anfitriao;
 
 
 -- 5) Total de últimas avaliações por ano
 SELECT
-    ano,
-    COUNT(SRK_aval) AS total_ultimas_avaliacoes
-FROM
-    gold.DIM_ULTIMA_AVALIACAO
-WHERE
-	ano IS NOT NULL
-	AND ano <= 2022
-GROUP BY
-    ano
-ORDER BY
-    ano ASC;
+    dimensao_ultima_avaliacao.ano AS ano,
+    COUNT(fato_anuncio.SRK_fato_anuncio) AS total_ultimas_avaliacoes
+FROM 
+    dw.FATO_ANUNCIO AS fato_anuncio
+JOIN 
+    dw.DIM_ULTIMA_AVALIACAO AS dimensao_ultima_avaliacao 
+    ON fato_anuncio.SRK_aval = dimensao_ultima_avaliacao.SRK_aval
+WHERE dimensao_ultima_avaliacao.ano IS NOT NULL
+GROUP BY dimensao_ultima_avaliacao.ano
+ORDER BY dimensao_ultima_avaliacao.ano;
 
 
 -- 6) Total de reservas/anúncios por grupo de bairro
 SELECT
-    T_LOCAL.grp_bairro,
-    COUNT(T_FATO.SRK_fato_anuncio) AS total_anuncios
+    dimensao_localizacao.grp_bairro AS grupo_bairro,
+    COUNT(fato_anuncio.SRK_fato_anuncio) AS total_anuncios
 FROM
-    gold.FATO_ANUNCIO AS T_FATO
+    dw.FATO_ANUNCIO AS fato_anuncio
 JOIN
-    gold.DIM_LOCALIZACAO AS T_LOCAL ON T_FATO.SRK_local = T_LOCAL.SRK_local
+    dw.DIM_LOCALIZACAO AS dimensao_localizacao 
+    ON fato_anuncio.SRK_local = dimensao_localizacao.SRK_local
 GROUP BY
-    T_LOCAL.grp_bairro
+    dimensao_localizacao.grp_bairro
 ORDER BY
     total_anuncios DESC;
 
 
--- 7)Total de avaliações por mês
+-- 7) Total de avaliações por mês
 SELECT
-    mes,
-    -- Para formatar o nome do mês (Opcional, pode ser feito no BI):
-    TO_CHAR(TO_DATE(mes::text, 'MM'), 'Month') AS nome_mes,
-    COUNT(SRK_aval) AS total_ultimas_avaliacoes
-FROM
-    gold.DIM_ULTIMA_AVALIACAO
-GROUP BY
-    mes
-ORDER BY
-    mes ASC;
+    dimensao_ultima_avaliacao.mes AS mes,
+    TO_CHAR(TO_DATE(dimensao_ultima_avaliacao.mes::text, 'MM'), 'Month') AS nome_mes,
+    COUNT(fato_anuncio.SRK_fato_anuncio) AS total_ultimas_avaliacoes
+FROM 
+    dw.FATO_ANUNCIO AS fato_anuncio
+JOIN 
+    dw.DIM_ULTIMA_AVALIACAO AS dimensao_ultima_avaliacao 
+    ON fato_anuncio.SRK_aval = dimensao_ultima_avaliacao.SRK_aval
+WHERE dimensao_ultima_avaliacao.mes IS NOT NULL
+GROUP BY dimensao_ultima_avaliacao.mes
+ORDER BY dimensao_ultima_avaliacao.mes;
 
 
 -- 8) Preço médio por bairro
 SELECT
-    T_LOCAL.bairro,
-    AVG(T_FATO.preco) AS media_preco
+    dimensao_localizacao.bairro AS bairro,
+    AVG(fato_anuncio.preco) AS media_preco
 FROM
-    gold.FATO_ANUNCIO AS T_FATO
+    dw.FATO_ANUNCIO AS fato_anuncio
 JOIN
-    gold.DIM_LOCALIZACAO AS T_LOCAL ON T_FATO.SRK_local = T_LOCAL.SRK_local
+    dw.DIM_LOCALIZACAO AS dimensao_localizacao 
+    ON fato_anuncio.SRK_local = dimensao_localizacao.SRK_local
 GROUP BY
-    T_LOCAL.bairro
+    dimensao_localizacao.bairro
 ORDER BY
-    media_preco DESC
-LIMIT 5;
+    media_preco DESC;
 
 
 -- 9) Top 10 anfitriões por total de avaliações
 SELECT
-    T_ANFI.nm_anfi,
-    SUM(T_FATO.tot_rev) AS total_reviews_do_host
+    dimensao_anfitriao.nm_anfi AS nome_anfitriao,
+    SUM(fato_anuncio.tot_rev) AS total_avaliacoes_anfitriao
 FROM
-    gold.FATO_ANUNCIO AS T_FATO
+    dw.FATO_ANUNCIO AS fato_anuncio
 JOIN
-    gold.DIM_ANFITRIAO AS T_ANFI ON T_FATO.SRK_anfi = T_ANFI.SRK_anfi
+    dw.DIM_ANFITRIAO AS dimensao_anfitriao 
+    ON fato_anuncio.SRK_anfi = dimensao_anfitriao.SRK_anfi
 GROUP BY
-    T_ANFI.nm_anfi
+    dimensao_anfitriao.nm_anfi
 ORDER BY
-    total_reviews_do_host DESC
-LIMIT 10;
+    total_avaliacoes_anfitriao DESC;
 
 
 -- 10) Preço médio por grupo de bairro e tipo de quarto
 SELECT
-    T_LOCAL.grp_bairro,
-    T_PROP.tipo_qto,
-    AVG(T_FATO.preco) AS media_preco
+    dimensao_localizacao.grp_bairro AS grupo_bairro,
+    dimensao_propriedade.tipo_qto AS tipo_quarto,
+    AVG(fato_anuncio.preco) AS media_preco
 FROM
-    gold.FATO_ANUNCIO AS T_FATO
+    dw.FATO_ANUNCIO AS fato_anuncio
 JOIN
-    gold.DIM_LOCALIZACAO AS T_LOCAL ON T_FATO.SRK_local = T_LOCAL.SRK_local
+    dw.DIM_LOCALIZACAO AS dimensao_localizacao 
+    ON fato_anuncio.SRK_local = dimensao_localizacao.SRK_local
 JOIN
-    gold.DIM_PROPRIEDADE AS T_PROP ON T_FATO.SRK_prop = T_PROP.SRK_prop
+    dw.DIM_PROPRIEDADE AS dimensao_propriedade 
+    ON fato_anuncio.SRK_prop = dimensao_propriedade.SRK_prop
 GROUP BY
-    T_LOCAL.grp_bairro,
-    T_PROP.tipo_qto
+    dimensao_localizacao.grp_bairro,
+    dimensao_propriedade.tipo_qto
 ORDER BY
-    T_LOCAL.grp_bairro,
-    T_PROP.tipo_qto;
+    dimensao_localizacao.grp_bairro,
+    dimensao_propriedade.tipo_qto;
 
--- 11)Média de avaliações por mês por grupo de bairro e tipo de quarto
+
+-- 11) Média de avaliações por mês por grupo de bairro e tipo de quarto
 SELECT
-    T_LOCAL.grp_bairro,
-    T_PROP.tipo_qto,
-    AVG(T_FATO.rev_mes) AS media_reviews_mes
+    dimensao_localizacao.grp_bairro AS grupo_bairro,
+    dimensao_propriedade.tipo_qto AS tipo_quarto,
+    AVG(fato_anuncio.rev_mes) AS media_avaliacoes_por_mes
 FROM
-    gold.FATO_ANUNCIO AS T_FATO
+    dw.FATO_ANUNCIO AS fato_anuncio
 JOIN
-    gold.DIM_LOCALIZACAO AS T_LOCAL ON T_FATO.SRK_local = T_LOCAL.SRK_local
+    dw.DIM_LOCALIZACAO AS dimensao_localizacao 
+    ON fato_anuncio.SRK_local = dimensao_localizacao.SRK_local
 JOIN
-    gold.DIM_PROPRIEDADE AS T_PROP ON T_FATO.SRK_prop = T_PROP.SRK_prop
+    dw.DIM_PROPRIEDADE AS dimensao_propriedade 
+    ON fato_anuncio.SRK_prop = dimensao_propriedade.SRK_prop
 GROUP BY
-    T_LOCAL.grp_bairro,
-    T_PROP.tipo_qto
+    dimensao_localizacao.grp_bairro,
+    dimensao_propriedade.tipo_qto
 ORDER BY
-    T_LOCAL.grp_bairro,
-    T_PROP.tipo_qto;
+    dimensao_localizacao.grp_bairro,
+    dimensao_propriedade.tipo_qto;
