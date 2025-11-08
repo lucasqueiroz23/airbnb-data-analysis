@@ -14,9 +14,16 @@ FROM
 
 -- 3) Contagem de SUB REGIÕES POR BAIRRO
 SELECT
+    grp_bairro,
     COUNT(DISTINCT bairro) AS quantidade_bairros
 FROM
-    dw.DIM_LOCALIZACAO AS dimensao_localizacao;
+    dw.dim_localizacao
+WHERE
+    grp_bairro IS NOT NULL
+GROUP BY
+    grp_bairro
+ORDER BY
+    quantidade_bairros DESC;
 
 
 -- 4) Contagem de anfitriões
