@@ -16,7 +16,7 @@ CREATE TABLE dw.dim_anf (
 CREATE TABLE dw.dim_loc (
     srk_loc BIGSERIAL PRIMARY KEY,
     num_lat NUMERIC(10, 7),
-    num_long NUMERIC(10, 7),
+    num_lon NUMERIC(10, 7),
     nom_bai VARCHAR(255),
     grp_bai VARCHAR(255)
 );
@@ -45,7 +45,7 @@ CREATE TABLE dw.fat_anu (
     srk_anf BIGINT NOT NULL,
     srk_loc BIGINT NOT NULL,
     srk_ava BIGINT NOT NULL,
-    srk_pro BIGINT NOT NULL
+    srk_pro BIGINT NOT NULL,
 
     qtd_dia_dis INTEGER,
     val_pre NUMERIC(10, 2),
