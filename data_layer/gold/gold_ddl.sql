@@ -1,88 +1,87 @@
 CREATE SCHEMA IF NOT EXISTS dw;
 
-DROP TABLE IF EXISTS dw.FATO_ANUNCIO;
-DROP TABLE IF EXISTS dw.DIM_ANFITRIAO;
-DROP TABLE IF EXISTS dw.DIM_LOCALIZACAO;
-DROP TABLE IF EXISTS dw.DIM_PROPRIEDADE;
-DROP TABLE IF EXISTS dw.DIM_ULTIMA_AVALIACAO;
+DROP TABLE IF EXISTS dw.fat_anu;
+DROP TABLE IF EXISTS dw.dim_anf;
+DROP TABLE IF EXISTS dw.dim_loc;
+DROP TABLE IF EXISTS dw.dim_pro;
+DROP TABLE IF EXISTS dw.dim_ult_ava;
 
-CREATE TABLE dw.DIM_ANFITRIAO (
-    SRK_anfi BIGSERIAL PRIMARY KEY,
-    nm_anfi VARCHAR(255),
-    anfi_verif BOOLEAN,
-    anfi_tot_anun INTEGER
+CREATE TABLE dw.dim_anf (
+    srk_anf BIGSERIAL PRIMARY KEY,
+    nom_anf VARCHAR(255),
+    ind_ver_anf BOOLEAN,
+    qtd_anu_anf INTEGER
 );
 
-CREATE TABLE dw.DIM_LOCALIZACAO (
-    SRK_local BIGSERIAL PRIMARY KEY,
-    lat NUMERIC(10, 7),
-    long NUMERIC(10, 7),
-    bairro VARCHAR(255),
-    grp_bairro VARCHAR(255)
+CREATE TABLE dw.dim_loc (
+    srk_loc BIGSERIAL PRIMARY KEY,
+    num_lat NUMERIC(10, 7),
+    num_long NUMERIC(10, 7),
+    nom_bai VARCHAR(255),
+    grp_bai VARCHAR(255)
 );
 
-CREATE TABLE dw.DIM_ULTIMA_AVALIACAO (
-    SRK_aval BIGSERIAL PRIMARY KEY,
-    dt_ult_rev DATE,
-    ano INTEGER,
-    mes INTEGER,
-    trimestre INTEGER
+CREATE TABLE dw.dim_ult_ava (
+    srk_ava BIGSERIAL PRIMARY KEY,
+    dat_ava DATE,
+    num_ano INTEGER,
+    num_mes INTEGER,
+    num_tri INTEGER
 );
 
-CREATE TABLE dw.DIM_PROPRIEDADE (
-    SRK_prop BIGSERIAL PRIMARY KEY,
-    nm_anun TEXT,
-    tipo_qto VARCHAR(100),
-    min_noites INTEGER,
-    pol_cancel VARCHAR(100),
-    res_inst BOOLEAN,
-    ano_constr INTEGER,
-    tem_regras BOOLEAN
+CREATE TABLE dw.dim_pro (
+    srk_pro BIGSERIAL PRIMARY KEY,
+    nom_anu TEXT,
+    tip_qto VARCHAR(100),
+    qtd_min_noi INTEGER,
+    des_pol_can VARCHAR(100),
+    ind_res_ins BOOLEAN,
+    ano_con INTEGER,
+    ind_tem_reg BOOLEAN
 );
 
-CREATE TABLE dw.FATO_ANUNCIO (
-    SRK_fato_anuncio BIGSERIAL PRIMARY KEY,
-    
-    disp_365 INTEGER,
-    preco NUMERIC(10, 2),
-    tx_serv NUMERIC(10, 2),
-    tot_rev INTEGER,
-    rev_mes NUMERIC(5, 2),
-    nota_rev NUMERIC(10, 2),
-    
-    SRK_anfi BIGINT NOT NULL,
-    SRK_local BIGINT NOT NULL,
-    SRK_aval BIGINT NOT NULL,
-    SRK_prop BIGINT NOT NULL
+CREATE TABLE dw.fat_anu (
+    srk_fat BIGSERIAL PRIMARY KEY,
+    srk_anf BIGINT NOT NULL,
+    srk_loc BIGINT NOT NULL,
+    srk_ava BIGINT NOT NULL,
+    srk_pro BIGINT NOT NULL
+
+    qtd_dia_dis INTEGER,
+    val_pre NUMERIC(10, 2),
+    val_tax_ser NUMERIC(10, 2),
+    qtd_tot_ava INTEGER,
+    qtd_ava_mes NUMERIC(5, 2),
+    val_not_ava NUMERIC(10, 2)
 );
  
-ALTER TABLE dw.FATO_ANUNCIO ADD CONSTRAINT SRK_FATO_ANUNCIO_ANFI
-    FOREIGN KEY (SRK_anfi)
-    REFERENCES dw.DIM_ANFITRIAO (SRK_anfi)
+ALTER TABLE dw.fat_anu ADD CONSTRAINT srk_fat_anu_anf
+    FOREIGN KEY (srk_anf)
+    REFERENCES dw.dim_anf (srk_anf)
     ON DELETE RESTRICT;
  
-ALTER TABLE dw.FATO_ANUNCIO ADD CONSTRAINT SRK_FATO_ANUNCIO_LOCAL
-    FOREIGN KEY (SRK_local)
-    REFERENCES dw.DIM_LOCALIZACAO (SRK_local)
+ALTER TABLE dw.fat_anu ADD CONSTRAINT srk_fat_anu_loc
+    FOREIGN KEY (srk_loc)
+    REFERENCES dw.dim_loc (srk_loc)
     ON DELETE RESTRICT;
  
-ALTER TABLE dw.FATO_ANUNCIO ADD CONSTRAINT SRK_FATO_ANUNCIO_AVAL
-    FOREIGN KEY (SRK_aval)
-    REFERENCES dw.DIM_ULTIMA_AVALIACAO (SRK_aval)
+ALTER TABLE dw.fat_anu ADD CONSTRAINT srk_fat_anu_ava
+    FOREIGN KEY (srk_ava)
+    REFERENCES dw.dim_ult_ava (srk_ava)
     ON DELETE RESTRICT;
  
-ALTER TABLE dw.FATO_ANUNCIO ADD CONSTRAINT SRK_FATO_ANUNCIO_PROP
-    FOREIGN KEY (SRK_prop)
-    REFERENCES dw.DIM_PROPRIEDADE (SRK_prop)
+ALTER TABLE dw.fat_anu ADD CONSTRAINT srk_fat_anu_pro
+    FOREIGN KEY (srk_pro)
+    REFERENCES dw.dim_pro (srk_pro)
     ON DELETE RESTRICT;
 
-ALTER TABLE dw.FATO_ANUNCIO ADD CONSTRAINT CHK_FATO_REV_MES_NOT_NAN CHECK (rev_mes IS NULL OR rev_mes::text !~* '^(nan|inf|-inf)$');
-ALTER TABLE dw.FATO_ANUNCIO ADD CONSTRAINT CHK_FATO_PRECO_NOT_NAN   CHECK (preco IS NULL OR preco::text !~* '^(nan|inf|-inf)$');
-ALTER TABLE dw.FATO_ANUNCIO ADD CONSTRAINT CHK_FATO_TXSERV_NOT_NAN  CHECK (tx_serv IS NULL OR tx_serv::text !~* '^(nan|inf|-inf)$');
-ALTER TABLE dw.FATO_ANUNCIO ADD CONSTRAINT CHK_FATO_TOTREV_NOT_NAN  CHECK (tot_rev IS NULL OR tot_rev::text !~* '^(nan|inf|-inf)$');
-ALTER TABLE dw.FATO_ANUNCIO ADD CONSTRAINT CHK_FATO_NOTAREV_NOT_NAN CHECK (nota_rev IS NULL OR nota_rev::text !~* '^(nan|inf|-inf)$');
+ALTER TABLE dw.fat_anu ADD CONSTRAINT chk_fat_qtd_ava_mes_not_nan CHECK (qtd_ava_mes IS NULL OR qtd_ava_mes::text !~* '^(nan|inf|-inf)$');
+ALTER TABLE dw.fat_anu ADD CONSTRAINT chk_fat_val_pre_not_nan   CHECK (val_pre IS NULL OR val_pre::text !~* '^(nan|inf|-inf)$');
+ALTER TABLE dw.fat_anu ADD CONSTRAINT chk_fat_val_tax_ser_not_nan  CHECK (val_tax_ser IS NULL OR val_tax_ser::text !~* '^(nan|inf|-inf)$');
+ALTER TABLE dw.fat_anu ADD CONSTRAINT chk_fat_qtd_tot_ava_not_nan  CHECK (qtd_tot_ava IS NULL OR qtd_tot_ava::text !~* '^(nan|inf|-inf)$');
+ALTER TABLE dw.fat_anu ADD CONSTRAINT chk_fat_val_not_ava_not_nan CHECK (val_not_ava IS NULL OR val_not_ava::text !~* '^(nan|inf|-inf)$');
 
-CREATE INDEX IDX_FATO_FK_ANFI ON dw.FATO_ANUNCIO(SRK_anfi);
-CREATE INDEX IDX_FATO_FK_LOCAL ON dw.FATO_ANUNCIO(SRK_local);
-CREATE INDEX IDX_FATO_FK_AVAL ON dw.FATO_ANUNCIO(SRK_aval);
-CREATE INDEX IDX_FATO_FK_PROP ON dw.FATO_ANUNCIO(SRK_prop);
+CREATE INDEX idx_fat_fk_anf ON dw.fat_anu(srk_anf);
+CREATE INDEX idx_fat_fk_loc ON dw.fat_anu(srk_loc);
+CREATE INDEX idx_fat_fk_ava ON dw.fat_anu(srk_ava);
+CREATE INDEX idx_fat_fk_pro ON dw.fat_anu(srk_pro);
